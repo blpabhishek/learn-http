@@ -1,8 +1,24 @@
 const fs = require('fs');
 
-const homePage = function (req, res) {
-  const content = fs.readFileSync('./index.html');
-  res.setHeader('Content-Type', 'text/html');
+const { App } = require('./app');
+
+const MIME_TYPES = {
+  'html': 'text/html',
+  'css': 'text/css',
+};
+
+const serveStaticPage = function (req, res,next) {
+  const publicFolder = `${__dirname}/public`;
+  const path = req.url === '/' ? '/index.html' : req.url;
+  const absolutePath = publicFolder + path;
+  const stat = fs.existsSync(absolutePath) && fs.statSync(absolutePath);
+  if (!stat || !stat.isFile()){
+    next();
+    return;
+  }
+  const content = fs.readFileSync(absolutePath);
+  const extension = path.split('.').pop();
+  res.setHeader('Content-Type', MIME_TYPES[extension]);
   res.end(content);
 };
 
@@ -12,13 +28,8 @@ const notFound = function (req, res) {
 };
 
 const register = function (req, res) {
-  let data = '';
-  req.on('data', (chunk) => data += chunk);
-  req.on('end', () => {
-    console.log(data);
-    res.end('Done');
-  });
-  return;
+  console.log('Body', req.body);
+  res.end('Done');
 };
 
 const methodNotAllowed = function (req, res) {
@@ -26,20 +37,23 @@ const methodNotAllowed = function (req, res) {
   res.end();
 }
 
-const getHandlers = {
-  '/': homePage,
-  'defaultHandler': notFound
+const readBody = function (req, res, next) {
+  let data = '';
+  req.on('data', (chunk) => data += chunk);
+  req.on('end', () => {
+    req.body = data;
+    next();
+  });
 };
 
-const postHandlers = {
-  '/register': register,
-  'defaultHandler': notFound
-};
+const app = new App();
 
-const methods = {
-  GET: getHandlers,
-  POST: postHandlers,
-  NOT_ALLOWED: { defaultHandler: methodNotAllowed }
-}
+app.use(readBody);
 
-module.exports = {methods};
+app.get('', serveStaticPage);
+app.post('/register', register);
+app.get('', notFound);
+app.post('', notFound);
+app.use(methodNotAllowed);
+
+module.exports = { app };

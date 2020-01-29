@@ -4,9 +4,9 @@ const options = {
   hostname:'localhost',
   port:4000,
   path:'/register',
-  method:'POST',
+  method:'PUT',
   headers:{
-    'content-type':'text/plain'
+    'content-type':'application/json'
   }
 };
 
