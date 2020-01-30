@@ -1,0 +1,28 @@
+{
+  "name": "learn-http",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "nyc mocha",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blpabhishek/learn-http.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blpabhishek/learn-http/issues"
+  },
+  "homepage": "https://github.com/blpabhishek/learn-http#readme",
+  "devDependencies": {
+    "mocha": "^7.0.1",
+    "supertest": "^4.0.2"
+  }
+}
