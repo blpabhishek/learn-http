@@ -1,5 +1,7 @@
 const request = require('supertest');
 const { app } = require('../lib/handlers');
+const fs = require('fs');
+const config = require('../config');
 
 
 describe('GET Home Page', () => {
@@ -14,26 +16,39 @@ describe('GET Home Page', () => {
   });
 });
 
-describe('GET nonExisting Url',()=>{
-  it('should return 404 for a non existing page',(done)=>{
+describe('GET nonExisting Url', () => {
+  it('should return 404 for a non existing page', (done) => {
     request(app.serve.bind(app))
       .get('/badPage')
-      .expect(404,done);
+      .expect(404, done);
   });
 });
 
-describe('POST /register',()=>{
-  it('should post on the register url',()=>{
+describe('POST /register', () => {
+  it('should post on the register url', () => {
     request(app.serve.bind(app))
       .post('/register')
       .send('name=Ranbir')
       .expect(200)
       .expect('Done')
-      .expect((res)=>{
+      .expect((res) => {
         console.log(res);
       })
-      .end((err,res)=>{
+      .end((err, res) => {
         console.log(err);
       })
   });
+});
+
+describe('POST comment', () => {
+  it.only('should post the comment on the guestBookPage', (done) => {
+    request(app.serve.bind(app))
+      .post('/comment')
+      .send('name=Tom&comment=HeyJerry')
+      .expect('Location','/guestBook.html')
+      .expect(302, done)
+  });
+  after(()=>{
+    fs.truncateSync(config.DATA_STORE);
+  })
 });
